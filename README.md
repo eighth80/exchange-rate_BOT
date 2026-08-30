@@ -22,7 +22,7 @@
 
 ## 🤖 봇 초대
 
-[Discord 서버에 봇 초대하기](https://discord.com/oauth2/authorize?client_id=1543752145117909043&permissions=2147534848&integration_type=0&scope=bot+applications.commands)
+[Discord 서버에 봇 초대하기](https://discord.com/oauth2/authorize?client_id=1543752145117909043)
 
 ## 👤 Developer
 
