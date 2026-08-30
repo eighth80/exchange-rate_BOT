@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>exchange-rate_BOT</title>
+    <meta name="description" content="Discord에서 원화 기준 엔화, 달러, 위안 환율을 간편하게 확인할 수 있는 봇입니다.">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                         Roboto, "Noto Sans KR", sans-serif;
+            background: #0f1117;
+            color: #f2f3f5;
+            line-height: 1.7;
+        }
+
+        header {
+            padding: 80px 20px 60px;
+            text-align: center;
+            background: linear-gradient(135deg, #5865f2, #7289da);
+        }
+
+        header h1 {
+            margin: 0 0 10px;
+            font-size: 42px;
+        }
+
+        header p {
+            margin: 0;
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 50px 20px;
+        }
+
+        .card {
+            background: #181a20;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 25px;
+            border: 1px solid #2b2d31;
+        }
+
+        .card h2 {
+            margin-top: 0;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 22px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: white;
+            background: #5865f2;
+            font-weight: 600;
+        }
+
+        .button.secondary {
+            background: #2b2d31;
+        }
+
+        .button:hover {
+            opacity: 0.85;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: #949ba4;
+            border-top: 1px solid #2b2d31;
+            font-size: 14px;
+        }
+
+        a {
+            color: #7289da;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>exchange-rate_BOT</h1>
+    <p>Discord에서 간편하게 환율을 확인하세요.</p>
+
+    <div class="buttons">
+        <a class="button"
+           href="https://discord.com/oauth2/authorize?client_id=1543752145117909043&permissions=2147502080&integration_type=0&scope=bot%20applications.commands"
+           target="_blank">
+            Discord에 봇 추가
+        </a>
+
+        <a class="button secondary" href="terms.html">
+            이용약관
+        </a>
+
+        <a class="button secondary" href="privacy.html">
+            개인정보처리방침
+        </a>
+    </div>
+</header>
+
+<main class="container">
+
+    <section class="card">
+        <h2>💱 exchange-rate_BOT</h2>
+
+        <p>
+            <strong>exchange-rate_BOT</strong>은 Discord 서버에서
+            주요 통화의 환율을 간편하게 확인할 수 있도록 만들어진 Discord 봇입니다.
+        </p>
+
+        <p>
+            현재 엔화(JPY), 미국 달러(USD), 중국 위안(CNY)의
+            환율 정보를 확인할 수 있습니다.
+        </p>
+    </section>
+
+    <section class="card">
+        <h2>💴 지원 통화</h2>
+
+        <ul>
+            <li>🇯🇵 일본 엔화 (JPY)</li>
+            <li>🇺🇸 미국 달러 (USD)</li>
+            <li>🇨🇳 중국 위안 (CNY)</li>
+        </ul>
+    </section>
+
+    <section class="card">
+        <h2>🤖 주요 기능</h2>
+
+        <ul>
+            <li>엔화 환율 조회</li>
+            <li>달러 환율 조회</li>
+            <li>위안 환율 조회</li>
+            <li>Discord 슬래시 명령어 지원</li>
+        </ul>
+    </section>
+
+    <section class="card">
+        <h2>📜 운영 정보</h2>
+
+        <p>
+            운영자: <strong>eighth80</strong>
+        </p>
+
+        <p>
+            본 서비스는 개인 프로젝트로 운영되는 Discord 봇입니다.
+        </p>
+
+        <p>
+            환율 정보는 참고용으로 제공되며 실제 금융 거래에 사용하기 전에
+            최신 환율을 별도로 확인하시기 바랍니다.
+        </p>
+    </section>
+
+</main>
+
+<footer>
+    © 2026 eighth80 · exchange-rate_BOT
+</footer>
+
+</body>
+</html>
