@@ -1,73 +1,64 @@
-require('dotenv').config();
-const { Client, GatewayIntentBits, ApplicationCommandOptionType } = require('discord.js');
-const { handlePortfolioCommands } = require('./commands/portfolio');
-const { handleAssetCommand } = require('./commands/asset');
-const { handleTestAlertCommand } = require('./commands/testAlert');
-const { initSchedulers } = require('./schedulers/notifier');
+require("dotenv").config();
+const fs = require("fs");
+const path = require("path");
+const { Client, Collection, GatewayIntentBits } = require("discord.js");
+const { TEST_PREFIX } = require("./src/util/mode");
+const { warmUp } = require("./src/fx");
+
+if (!process.env.DISCORD_TOKEN) {
+  console.error("❌ DISCORD_TOKEN이 설정되지 않았습니다. .env 파일과 compose의 env_file 설정을 확인하세요.");
+  process.exit(1);
+}
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
-client.once('ready', async () => {
-    console.log(`✅ [Src 모듈 구조] 디스코드 배당 봇 가동 완료: ${client.user?.tag}`);
+// 이름 -> { cmd, test }
+//   배포용:  /달러
+//   테스트용: /테스트-달러  (TEST_GUILD_ID 서버에만 등록됨, 같은 코드지만 테스트 표시 + 진단 정보 포함)
+client.commands = new Collection();
 
-    // 슬래시 명령어 세팅
-    if (client.application) {
-        await client.application.commands.set([
-            {
-                name: '수량입력', description: '종목의 보유 수량을 수정하거나 추가합니다.',
-                options: [
-                    { name: '티커', type: ApplicationCommandOptionType.String, description: '예: SCHD', required: true },
-                    { name: '수량', type: ApplicationCommandOptionType.Number, description: '예: 12.5', required: true }
-                ]
-            },
-            {
-                name: '평단입력', description: '보유 종목의 평균단가를 입력합니다.',
-                options: [
-                    { name: '티커', type: ApplicationCommandOptionType.String, description: '예: SCHD', required: true },
-                    { name: '평단가', type: ApplicationCommandOptionType.Number, description: '예: 83.5', required: true }
-                ]
-            },
-            {
-                name: '종목삭제', description: '전량 매도 시 포트폴리오에서 완전히 삭제합니다.',
-                options: [{ name: '티커', type: ApplicationCommandOptionType.String, description: '예: SCHD', required: true }]
-            },
-            { name: '내자산', description: '현재 수익률, 원화 평가금액, 배당금 차트를 보여줍니다.' },
-            {
-                name: '테스트알림', description: '[테스트모드] 다양한 알림 및 멘션을 즉시 검증합니다.',
-                options: [
-                    {
-                        name: '유형',
-                        type: ApplicationCommandOptionType.String,
-                        description: '테스트 종류 선택',
-                        required: true,
-                        choices: [
-                            { name: '💰 배당금 지급일 알림 (멘션 포함)', value: 'paydate' },
-                            { name: '🚀 급등 알림', value: 'surge' },
-                            { name: '🚨 하락 경고 알림', value: 'drop' }
-                        ]
-                    }
-                ]
-            }
-        ]);
-    }
+const commandsPath = path.join(__dirname, "src", "commands");
+for (const file of fs.readdirSync(commandsPath).filter((f) => f.endsWith(".js"))) {
+  const cmd = require(path.join(commandsPath, file));
+  if (!cmd.data || !cmd.execute) continue;
 
-    // 크론 스케줄러 가동
-    initSchedulers(client);
+  client.commands.set(cmd.data.name, { cmd, test: false });
+  client.commands.set(`${TEST_PREFIX}${cmd.data.name}`, { cmd, test: true });
+  console.log(`✅ 로드됨: /${cmd.data.name} (+ /${TEST_PREFIX}${cmd.data.name})`);
+}
+
+client.once("ready", () => {
+  console.log(`로그인 완료: ${client.user.tag}`);
+  warmUp(); // 기다리지 않고 백그라운드로 환율 캐시 준비
 });
 
-// 디스코드 명령어 라우팅
-client.on('interactionCreate', async (interaction) => {
-    if (!interaction.isChatInputCommand()) return;
+client.on("interactionCreate", async (interaction) => {
+  if (!interaction.isChatInputCommand()) return;
 
-    const { commandName } = interaction;
+  const entry = client.commands.get(interaction.commandName);
+  if (!entry) return;
 
-    if (['수량입력', '평단입력', '종목삭제'].includes(commandName)) {
-        await handlePortfolioCommands(interaction);
-    } else if (commandName === '내자산') {
-        await handleAssetCommand(interaction);
-    } else if (commandName === '테스트알림') {
-        await handleTestAlertCommand(interaction);
+  console.log(
+    `[cmd] /${interaction.commandName} · ${interaction.user.tag} · ${interaction.guild?.name ?? "DM"}`
+  );
+
+  try {
+    await entry.cmd.execute(interaction, { test: entry.test });
+  } catch (e) {
+    console.error(e);
+    try {
+      if (interaction.deferred || interaction.replied) {
+        await interaction.editReply("❌ 오류 발생");
+      } else {
+        await interaction.reply("❌ 오류 발생");
+      }
+    } catch (e2) {
+      console.error("오류 응답 전송 실패:", e2.message);
     }
+  }
 });
+
+client.on("error", (e) => console.error("[client error]", e));
+process.on("unhandledRejection", (e) => console.error("[unhandledRejection]", e));
 
 client.login(process.env.DISCORD_TOKEN);
